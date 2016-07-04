@@ -33,6 +33,7 @@ func watchFile(b *Buffer, file string) (err error) {
 		Follow:    true,
 		MustExist: true,
 		ReOpen:    false,
+		Poll:      true,
 	})
 	if err != nil {
 		return
