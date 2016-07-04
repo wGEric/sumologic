@@ -99,7 +99,7 @@ func TestWatchFile(t *testing.T) {
 		f.WriteString("test3\n")
 		f.Sync()
 		f.Close()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		os.Remove(f.Name())
 	}()
 
