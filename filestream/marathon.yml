@@ -4,7 +4,7 @@ mem: 512
 instances: 1
 args: [
     "-f",
-    "/logs/{{logDir}}/{{logFile}}",
+    "/logs{{logDir}}/{{logFile}}",
     "-u",
     "{{url}}",
     "-n",
@@ -15,7 +15,7 @@ container:
     image: {{registry}}/sumologic-filestream:{{version}}
     volumes:
     -
-        containerPath: "/logs/{{logDir}}"
+        containerPath: "/logs{{logDir}}"
         hostPath: {{logDir}}
         mode: RO
     parameters:
