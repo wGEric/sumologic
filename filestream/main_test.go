@@ -2,6 +2,8 @@ package main // import "github.com/nutmegdevelopment/sumologic/filestream"
 
 import (
 	"errors"
+	"io/ioutil"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -84,4 +86,30 @@ func TestBufferRace(t *testing.T) {
 
 	q1 <- true
 	q2 <- true
+}
+
+func TestWatchFile(t *testing.T) {
+	b := NewBuffer()
+	f, err := ioutil.TempFile("/tmp", "filestream-test")
+	assert.NoError(t, err)
+
+	go func() {
+		f.WriteString("test1\n")
+		f.WriteString("test2\n")
+		f.WriteString("test3\n")
+		f.Sync()
+		f.Close()
+		time.Sleep(3 * time.Second)
+		os.Remove(f.Name())
+	}()
+
+	err = watchFile(b, f.Name())
+	assert.NoError(t, err)
+
+	assert.Equal(t, []byte("test1"), b.data[0])
+	assert.Equal(t, []byte("test2"), b.data[1])
+	assert.Equal(t, []byte("test3"), b.data[2])
+
+	err = watchFile(b, f.Name())
+	assert.Error(t, err)
 }

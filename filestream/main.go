@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dleung/gotail"
+	"github.com/hpcloud/tail"
 	"github.com/nutmegdevelopment/sumologic/upload"
 )
 
@@ -24,19 +24,25 @@ func init() {
 	flag.StringVar(&fileName, "f", "", "File to stream")
 	flag.StringVar(&url, "u", "http://localhost", "URL of sumologic collector")
 	flag.StringVar(&sendName, "n", "", "Name to send to Sumologic")
-	flag.IntVar(&bTime, "b", 5, "Maximum time to buffer messages before upload")
+	flag.IntVar(&bTime, "b", 3, "Maximum time to buffer messages before upload")
 	flag.Parse()
 }
 
-func watchFile(b *Buffer) {
-	t, err := gotail.NewTail(fileName, gotail.Config{Timeout: 10})
+func watchFile(b *Buffer, file string) (err error) {
+	t, err := tail.TailFile(file, tail.Config{
+		Follow:    true,
+		MustExist: true,
+		ReOpen:    false,
+	})
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
+	defer t.Cleanup()
 	for line := range t.Lines {
-		b.Add([]byte(line))
+		b.Add([]byte(line.Text))
 	}
-	log.Fatal("I/O Error")
+	err = t.Wait()
+	return err
 }
 
 func sender(in []byte) (err error) {
@@ -94,15 +100,23 @@ func (b *Buffer) Send(sendFunc func([]byte) error) (err error) {
 }
 
 func main() {
-	b := NewBuffer()
+	buf := NewBuffer()
 	uploader = upload.NewUploader(url)
+	quit := make(chan bool)
 
 	go func() {
 		for {
-			time.Sleep(time.Second * time.Duration(bTime))
-			b.Send(sender)
+			select {
+			case <-quit:
+				return
+			default:
+				time.Sleep(time.Second * time.Duration(bTime))
+				buf.Send(sender)
+			}
 		}
 	}()
 
-	watchFile(b)
+	err := watchFile(buf, fileName)
+	quit <- true
+	log.Fatal(err)
 }
