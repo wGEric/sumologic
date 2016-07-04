@@ -12,7 +12,7 @@ build:
 	$(DOCKER) run --rm \
 		--privileged \
 		-v $(WORKDIR):/src \
-		-e CGO_ENABLED=0 \
+		-e CGO_ENABLED=1 \
 		-e LDFLAGS='-s -extldflags -static' \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		$(BUILDER) \
