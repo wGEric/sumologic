@@ -1,0 +1,24 @@
+id: /{{name}}
+cpus: 0.01
+mem: 512
+instances: 1
+args: [
+    "-f",
+    "/mnt/{{logfile}}",
+    "-u",
+    "{{url}}",
+    "-n",
+    "{{tagName}}"
+    ]
+container:
+  docker:
+    image: {{registry}}/sumologic-filestream:{{version}}
+    volumes:
+    -
+        containerPath: "/mnt/{{logfile}}"
+        hostPath: {{logfile}}
+        mode: RO
+    parameters:
+      -
+        key: label
+        value: APP_NAME={{name}}
