@@ -11,16 +11,21 @@ import (
 // are compressed when sent.
 var GzipThreshold = 2 << 16
 
-// Uploader is a reusable object to upload data to a single
+// Uploader is an interface to allow easy testing.
+type Uploader interface {
+	Send([]byte, string) error
+}
+
+// httpUploader is a reusable object to upload data to a single
 // Sumologic HTTP collector.
-type Uploader struct {
+type httpUploader struct {
 	url       string
 	multiline bool
 }
 
 // NewUploader creates a new uploader.
-func NewUploader(url string) *Uploader {
-	u := new(Uploader)
+func NewUploader(url string) Uploader {
+	u := new(httpUploader)
 	u.url = url
 	return u
 }
@@ -28,7 +33,7 @@ func NewUploader(url string) *Uploader {
 // Send sends a message to a Sumologic HTTP collector.  It will
 // automatically compress messages larger than GzipThreshold.  Optionally,
 // a name will be specified, if so this will be added as metadata.
-func (u *Uploader) Send(input []byte, name ...string) (err error) {
+func (u *httpUploader) Send(input []byte, name string) (err error) {
 	// nil input is a noop
 	if input == nil {
 		return
@@ -67,8 +72,8 @@ func (u *Uploader) Send(input []byte, name ...string) (err error) {
 		}
 	}
 
-	if name != nil {
-		req.Header.Set("X-Sumo-Name", name[0])
+	if name != "" {
+		req.Header.Set("X-Sumo-Name", name)
 	}
 
 	resp, err := client.Do(req)

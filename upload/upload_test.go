@@ -31,11 +31,16 @@ func TestUploader(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	u := NewUploader(ts.URL)
-	assert.Equal(t, ts.URL, u.url)
+	// Invalid URLs should fail
+	u := NewUploader("junk://")
+	err := u.Send(testData, "")
+	assert.Error(t, err)
+
+	u = NewUploader(ts.URL)
+	assert.Equal(t, ts.URL, u.(*httpUploader).url)
 
 	// Basic usage
-	err := u.Send(testData)
+	err = u.Send(testData, "")
 	assert.NoError(t, err)
 	assert.Equal(t, testData, data)
 	assert.Empty(t, name)
@@ -43,11 +48,11 @@ func TestUploader(t *testing.T) {
 
 	// nil input should not panic
 	assert.NotPanics(t, func() {
-		u.Send(nil)
+		u.Send(nil, "")
 	})
 
 	// Empty data should return an error
-	err = u.Send([]byte{})
+	err = u.Send([]byte{}, "")
 	assert.Error(t, err)
 
 	// Test that name is sent
@@ -59,7 +64,7 @@ func TestUploader(t *testing.T) {
 
 	// Test compression
 	GzipThreshold = 0
-	u.Send(testData)
+	u.Send(testData, "")
 	assert.NoError(t, err)
 	assert.Empty(t, name)
 	assert.Equal(t, "gzip", contentEnc)

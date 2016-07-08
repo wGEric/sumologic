@@ -1,13 +1,12 @@
 package main // import "github.com/nutmegdevelopment/sumologic/filestream"
 
 import (
-	"bytes"
 	"flag"
 	"log"
-	"sync"
 	"time"
 
 	"github.com/hpcloud/tail"
+	"github.com/nutmegdevelopment/sumologic/buffer"
 	"github.com/nutmegdevelopment/sumologic/upload"
 )
 
@@ -17,7 +16,7 @@ var (
 	url      string
 	sendName string
 	bSize    = 4096
-	uploader *upload.Uploader
+	uploader upload.Uploader
 )
 
 func init() {
@@ -28,7 +27,7 @@ func init() {
 	flag.Parse()
 }
 
-func watchFile(b *Buffer, file string) (err error) {
+func watchFile(b *buffer.Buffer, file string) (err error) {
 	t, err := tail.TailFile(file, tail.Config{
 		Follow:    true,
 		MustExist: true,
@@ -40,68 +39,14 @@ func watchFile(b *Buffer, file string) (err error) {
 	}
 	defer t.Cleanup()
 	for line := range t.Lines {
-		b.Add([]byte(line.Text))
+		b.Add([]byte(line.Text), sendName)
 	}
 	err = t.Wait()
 	return err
 }
 
-func sender(in []byte) (err error) {
-	if sendName == "" {
-		err = uploader.Send(in)
-	} else {
-		err = uploader.Send(in, sendName)
-	}
-	return
-}
-
-// Buffer is a basic buffer structure.
-type Buffer struct {
-	sync.Mutex
-	data [][]byte
-	ref  int
-}
-
-// NewBuffer allocates a new buffer
-func NewBuffer() *Buffer {
-	b := new(Buffer)
-	b.data = make([][]byte, bSize)
-	return b
-}
-
-// Add appends data to the buffer
-func (b *Buffer) Add(in []byte) {
-	b.Lock()
-	defer b.Unlock()
-	if b.ref >= len(b.data) {
-		b.data = append(b.data, make([][]byte, bSize)...)
-	}
-	b.data[b.ref] = in
-	b.ref++
-}
-
-// Send transmits data in the buffer using a provided sendFunc.
-// This is not safe to call concurrently.
-func (b *Buffer) Send(sendFunc func([]byte) error) (err error) {
-	b.Lock()
-	buf := b.data[:b.ref]
-	b.Unlock()
-
-	data := bytes.Join(buf, []byte("\n"))
-	err = sendFunc(data)
-	if err == nil {
-		// If upload suceeded, clear transmitted portion of buffer
-		b.Lock()
-		b.data = b.data[len(buf):]
-		b.ref = b.ref - len(buf)
-		b.Unlock()
-	}
-
-	return
-}
-
 func main() {
-	buf := NewBuffer()
+	buf := buffer.NewBuffer(bSize)
 	uploader = upload.NewUploader(url)
 	quit := make(chan bool)
 
@@ -112,7 +57,7 @@ func main() {
 				return
 			default:
 				time.Sleep(time.Second * time.Duration(bTime))
-				buf.Send(sender)
+				buf.Send(uploader)
 			}
 		}
 	}()
