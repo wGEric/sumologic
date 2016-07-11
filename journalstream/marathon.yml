@@ -1,0 +1,18 @@
+id: /sumologic-journalstream
+cpus: 0.01
+mem: 256
+instances: 1
+args: [
+    "-u",
+    "{{url}}",
+    "-n",
+    "_APP_NAME"
+    ]
+container:
+    docker:
+        image: {{registry}}/sumologic-journalstream:{{version}}
+        privileged: true
+        parameters:
+        -
+            key: label
+            value: APP_NAME=sumologic-journalstream
