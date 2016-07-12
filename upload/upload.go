@@ -42,10 +42,7 @@ func (u *httpUploader) Send(input []byte, name string) (err error) {
 	client := new(http.Client)
 	buf := new(bytes.Buffer)
 
-	req, err := http.NewRequest("POST", u.url, buf)
-	if err != nil {
-		return
-	}
+	req := new(http.Request)
 
 	if len(input) > GzipThreshold {
 		w := gzip.NewWriter(buf)
@@ -61,6 +58,11 @@ func (u *httpUploader) Send(input []byte, name string) (err error) {
 			return err
 		}
 
+		req, err = http.NewRequest("POST", u.url, buf)
+		if err != nil {
+			return err
+		}
+
 		req.Header.Set("Content-Encoding", "gzip")
 	} else {
 		n, err := buf.Write(input)
@@ -68,7 +70,12 @@ func (u *httpUploader) Send(input []byte, name string) (err error) {
 			return err
 		}
 		if n != len(input) {
-			return errors.New("Error compressing data")
+			return errors.New("Error sending data")
+		}
+
+		req, err = http.NewRequest("POST", u.url, buf)
+		if err != nil {
+			return err
 		}
 	}
 

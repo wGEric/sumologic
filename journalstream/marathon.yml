@@ -11,6 +11,11 @@ args: [
     "APP_NAME"
     ]
 container:
+    volumes:
+    -
+        containerPath: "/var/log/journal"
+        hostPath: "/var/log/journal"
+        mode: RO
     docker:
         image: {{registry}}/sumologic-journalstream:{{version}}
         privileged: true
@@ -18,3 +23,6 @@ container:
         -
             key: label
             value: APP_NAME=sumologic-journalstream
+        -
+            key: log-driver
+            value: json-file
