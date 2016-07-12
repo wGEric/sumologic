@@ -9,6 +9,7 @@ BUILDER ?= centurylink/golang-builder
 TESTER ?= centurylink/golang-tester
 
 build:
+	$(DOCKER) pull $(BUILDER)
 	$(DOCKER) run --rm \
 		--privileged \
 		-v $(WORKDIR):/src \
@@ -20,6 +21,7 @@ build:
 	$(DOCKER) tag -f $(DOCKERREPO)/$(APPNAME):$(DOCKERTAG) $(DOCKERREPO)/$(APPNAME):latest
 
 test:
+	$(DOCKER) pull $(TESTER)
 	$(DOCKER) run --rm \
 		-v $(WORKDIR):/src \
 		$(TESTER) \
