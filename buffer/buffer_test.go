@@ -1,4 +1,4 @@
-package buffer
+package buffer // import "github.com/nutmegdevelopment/sumologic/buffer"
 
 import (
 	"errors"
