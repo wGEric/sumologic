@@ -25,7 +25,8 @@ test:
 	$(DOCKER) run --rm \
 		--privileged \
 		-v $(WORKDIR):/src \
-		-v /var/log/journal:/var/log/journal \
+		-v /var/log/journal:/var/log/journal:ro \
+		-v /run/systemd/journal:/run/systemd/journal:rw \
 		$(TESTER) \
 		$(DOCKERREPO)/$(APPNAME):$(DOCKERTAG)
 
