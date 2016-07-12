@@ -1,7 +1,7 @@
 id: /sumologic-journalstream
 cpus: 0.01
 mem: 256
-instances: 1
+instances: {{count}}
 args: [
     "-u",
     "{{url}}",
