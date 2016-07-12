@@ -5,8 +5,10 @@ instances: 1
 args: [
     "-u",
     "{{url}}",
+    "-w",
+    "30",
     "-n",
-    "_APP_NAME"
+    "APP_NAME"
     ]
 container:
     docker:
