@@ -28,7 +28,7 @@ func init() {
 }
 
 func watch(eventCh chan<- *sdjournal.JournalEntry, quitChan <-chan bool) {
-	j, err := sdjournal.NewJournal()
+	j, err := sdjournal.NewJournalFromDir("/var/log/journal")
 	if err != nil {
 		log.Fatal(err)
 	}
