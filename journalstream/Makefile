@@ -23,6 +23,7 @@ build:
 test:
 	$(DOCKER) pull $(TESTER)
 	$(DOCKER) run --rm \
+		--privileged \
 		-v $(WORKDIR):/src \
 		$(TESTER) \
 		$(DOCKERREPO)/$(APPNAME):$(DOCKERTAG)
