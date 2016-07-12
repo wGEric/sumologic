@@ -9,7 +9,7 @@ BUILDER ?= centurylink/golang-builder
 TESTER ?= centurylink/golang-tester
 
 build:
-	$(DOCKER) build . -t $(DOCKERREPO)/$(APPNAME):$(DOCKERTAG) 
+	$(DOCKER) build -t $(DOCKERREPO)/$(APPNAME):$(DOCKERTAG) . 
 	$(DOCKER) tag -f $(DOCKERREPO)/$(APPNAME):$(DOCKERTAG) $(DOCKERREPO)/$(APPNAME):latest
 
 test:
