@@ -24,7 +24,12 @@ func init() {
 	flag.StringVar(&nameField, "n", "_SYSTEMD_UNIT", "Journald field to use as log name")
 	flag.IntVar(&bTime, "b", 3, "Maximum time to buffer messages before upload")
 	flag.Int64Var(&window, "w", 30, "Time Window. Maximum age (in seconds) of log entries to relay.")
+	debug := flag.Bool("d", false, "Debug mode")
 	flag.Parse()
+
+	if *debug {
+		log.SetLevel(log.DebugLevel)
+	}
 }
 
 func watch(eventCh chan<- *sdjournal.JournalEntry, quitChan <-chan bool) {
@@ -32,6 +37,8 @@ func watch(eventCh chan<- *sdjournal.JournalEntry, quitChan <-chan bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Debug("Journald watcher started")
 
 	defer close(eventCh)
 
@@ -66,7 +73,7 @@ func watch(eventCh chan<- *sdjournal.JournalEntry, quitChan <-chan bool) {
 }
 
 func parse(eventCh <-chan *sdjournal.JournalEntry, buf *buffer.Buffer, quitChan <-chan bool) {
-
+	log.Debug("Journald parser started")
 	for {
 		select {
 		case <-quitChan:
@@ -116,6 +123,10 @@ func main() {
 
 	for {
 		time.Sleep(time.Second * time.Duration(bTime))
-		buf.Send(uploader)
+		log.Debug("Sending data to:", url)
+		err := buf.Send(uploader)
+		if err != nil {
+			log.Error(err)
+		}
 	}
 }

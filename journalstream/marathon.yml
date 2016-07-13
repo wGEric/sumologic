@@ -8,7 +8,8 @@ args: [
     "-w",
     "30",
     "-n",
-    "APP_NAME"
+    "APP_NAME",
+    "-d"
     ]
 container:
     volumes:
