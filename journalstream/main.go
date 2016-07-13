@@ -123,7 +123,6 @@ func main() {
 
 	for {
 		time.Sleep(time.Second * time.Duration(bTime))
-		log.Debug("Sending data to:", url)
 		err := buf.Send(uploader)
 		if err != nil {
 			log.Error(err)

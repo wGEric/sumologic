@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"sync"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/nutmegdevelopment/sumologic/upload"
 )
 
@@ -60,9 +61,13 @@ func (b *Buffer) Send(u upload.Uploader) (err error) {
 		}
 	}
 
+	log.Debugf("%d unique names in buffer", len(packets))
+
 	for n := range packets {
+		log.Debugf("Sending data for name: %s (%d bytes)", n, len(packets[n]))
 		thisErr := u.Send(packets[n], n)
 		if thisErr != nil {
+			log.Debugf("Send error: %s", err)
 			err = thisErr
 		}
 	}

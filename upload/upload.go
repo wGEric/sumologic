@@ -5,6 +5,8 @@ import (
 	"compress/gzip"
 	"errors"
 	"net/http"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // GzipThreshold sets the threshold size over which messages
@@ -45,6 +47,7 @@ func (u *httpUploader) Send(input []byte, name string) (err error) {
 	req := new(http.Request)
 
 	if len(input) > GzipThreshold {
+		log.Debugf("Data over threshold, compressing (%s bytes)", len(input))
 		w := gzip.NewWriter(buf)
 		n, err := w.Write(input)
 		if err != nil {
@@ -87,6 +90,8 @@ func (u *httpUploader) Send(input []byte, name string) (err error) {
 	if err != nil {
 		return
 	}
+
+	log.Debugf("Response: %s", resp.Status)
 
 	if resp.StatusCode != 200 {
 		return errors.New(resp.Status)
