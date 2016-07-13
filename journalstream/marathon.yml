@@ -11,6 +11,10 @@ args: [
     "APP_NAME",
     "-d"
     ]
+constraints:
+  -
+    - hostname
+    - UNIQUE
 container:
     volumes:
     -
