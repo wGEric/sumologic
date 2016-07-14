@@ -31,3 +31,6 @@ container:
         -
             key: log-driver
             value: json-file
+        -
+            key: security-opt
+            value: label:disable
