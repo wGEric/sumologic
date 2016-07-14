@@ -9,6 +9,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// DebugLogging enables debug logging
+func DebugLogging() {
+	log.SetLevel(log.DebugLevel)
+}
+
 // GzipThreshold sets the threshold size over which messages
 // are compressed when sent.
 var GzipThreshold = 2 << 16

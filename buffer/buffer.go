@@ -8,6 +8,11 @@ import (
 	"github.com/nutmegdevelopment/sumologic/upload"
 )
 
+// DebugLogging enables debug logging
+func DebugLogging() {
+	log.SetLevel(log.DebugLevel)
+}
+
 type sender interface {
 	send([]byte, string) error
 }

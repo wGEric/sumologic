@@ -28,6 +28,8 @@ func init() {
 	flag.Parse()
 
 	if *debug {
+		buffer.DebugLogging()
+		upload.DebugLogging()
 		log.SetLevel(log.DebugLevel)
 	}
 }

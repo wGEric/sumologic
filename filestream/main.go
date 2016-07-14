@@ -2,9 +2,9 @@ package main // import "github.com/nutmegdevelopment/sumologic/filestream"
 
 import (
 	"flag"
-	"log"
 	"time"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/hpcloud/tail"
 	"github.com/nutmegdevelopment/sumologic/buffer"
 	"github.com/nutmegdevelopment/sumologic/upload"
@@ -24,7 +24,14 @@ func init() {
 	flag.StringVar(&url, "u", "http://localhost", "URL of sumologic collector")
 	flag.StringVar(&sendName, "n", "", "Name to send to Sumologic")
 	flag.IntVar(&bTime, "b", 3, "Maximum time to buffer messages before upload")
+	debug := flag.Bool("d", false, "Debug mode")
 	flag.Parse()
+
+	if *debug {
+		buffer.DebugLogging()
+		upload.DebugLogging()
+		log.SetLevel(log.DebugLevel)
+	}
 }
 
 func watchFile(b *buffer.Buffer, file string) (err error) {
