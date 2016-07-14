@@ -105,6 +105,7 @@ func parse(eventCh <-chan *sdjournal.JournalEntry, buf *buffer.Buffer, quitChan 
 				}
 
 				buf.Add([]byte(msg), name)
+				log.Debugf("Adding data to buffer for name: %s", name)
 
 			}
 
