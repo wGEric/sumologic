@@ -6,10 +6,10 @@ args: [
     "-u",
     "{{url}}",
     "-w",
-    "30",
+    "{{window}}",
     "-n",
     "APP_NAME",
-    "-d"
+    "{{opts}}"
     ]
 constraints:
   -
