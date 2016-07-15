@@ -56,6 +56,7 @@ func watch(eventCh chan<- *sdjournal.JournalEntry, quitChan <-chan bool) {
 
 			if n == 0 {
 				// At the end of the journal, wait for new entries
+				log.Debug("Waiting for new journal entries")
 				ret := j.Wait(300 * time.Second)
 				if ret != 0 {
 					log.Fatalf("Error waiting for journal entries: %d", ret)
