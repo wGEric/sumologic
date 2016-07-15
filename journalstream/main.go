@@ -42,6 +42,12 @@ func watch(eventCh chan<- *sdjournal.JournalEntry, quitChan <-chan bool) {
 
 	log.Debug("Journald watcher started")
 
+	err = j.SeekTail()
+	if err != nil {
+		log.Fatal("Unable to seek to end of journal")
+	}
+	log.Debug("Journal seek completed")
+
 	defer close(eventCh)
 
 	for {
