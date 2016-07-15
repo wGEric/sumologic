@@ -60,7 +60,7 @@ func watch(eventCh chan<- *sdjournal.JournalEntry, quitChan <-chan bool) {
 				if ret != 0 {
 					log.Fatalf("Error waiting for journal entries: %d", ret)
 				}
-				log.Info("No journal entries for 300 seconds")
+				log.Warn("No journal entries for 300 seconds")
 				continue
 			}
 
@@ -106,10 +106,7 @@ func parse(eventCh <-chan *sdjournal.JournalEntry, buf *buffer.Buffer, quitChan 
 				}
 
 				buf.Add([]byte(msg), name)
-				log.Debugf("Adding data to buffer for name: %s", name)
 
-			} else {
-				log.Debugf("Message age (%.2fs) outside time window, skipping", time.Now().Sub(eventTime).Seconds())
 			}
 
 		}
