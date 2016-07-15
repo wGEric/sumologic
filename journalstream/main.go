@@ -67,7 +67,9 @@ func watch(eventCh chan<- *sdjournal.JournalEntry, quitChan <-chan bool) {
 				if ret < 0 {
 					log.Fatalf("Error waiting for journal entries: %d", ret)
 				}
-				log.Warn("No journal entries for 300 seconds")
+				if ret == sdjournal.SD_JOURNAL_NOP {
+					log.Warn("No journal entries for 300 seconds")
+				}
 				continue
 			}
 
