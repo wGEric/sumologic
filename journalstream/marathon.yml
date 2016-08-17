@@ -1,6 +1,6 @@
 id: /sumologic-journalstream
 cpus: 0.01
-mem: 256
+mem: 400
 instances: {{count}}
 args: [
     "-u",
@@ -34,3 +34,5 @@ container:
         -
             key: security-opt
             value: label:disable
+        portMappings:
+        - containerPort: 6060

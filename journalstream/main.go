@@ -4,6 +4,8 @@ import (
 	"flag"
 	"time"
 
+	_ "net/http/pprof"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/coreos/go-systemd/sdjournal"
 	"github.com/nutmegdevelopment/sumologic/buffer"
@@ -123,6 +125,10 @@ func parse(eventCh <-chan *sdjournal.JournalEntry, buf *buffer.Buffer, quitChan 
 }
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
+	}()
+
 	uploader = upload.NewUploader(url)
 	buf := buffer.NewBuffer(bSize)
 
