@@ -4,6 +4,7 @@ import (
 	"flag"
 	"time"
 
+	"net/http"
 	_ "net/http/pprof"
 
 	log "github.com/Sirupsen/logrus"
