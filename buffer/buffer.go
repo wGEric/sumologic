@@ -40,8 +40,13 @@ func (b *Buffer) Add(data []byte, name string) {
 	b.Lock()
 	defer b.Unlock()
 	if b.ref >= len(b.data) {
-		b.data = append(b.data, make([][]byte, b.size)...)
-		b.names = append(b.names, make([]string, b.size)...)
+		data := append(b.data, make([][]byte, b.size)...)
+		b.data = nil
+		b.data = data
+
+		names := append(b.names, make([]string, b.size)...)
+		b.names = nil
+		b.names = names
 	}
 	b.data[b.ref] = data
 	b.names[b.ref] = name
@@ -60,7 +65,10 @@ func (b *Buffer) Send(u upload.Uploader) (err error) {
 
 	for i, n := range nbuf {
 		if _, ok := packets[n]; ok {
-			packets[n] = bytes.Join([][]byte{packets[n], buf[i]}, []byte("\n"))
+			data := [][]byte{packets[n], buf[i]}
+			packets[n] = nil
+			packets[n] = bytes.Join(data, []byte("\n"))
+			data = nil
 		} else {
 			packets[n] = buf[i]
 		}
@@ -79,11 +87,22 @@ func (b *Buffer) Send(u upload.Uploader) (err error) {
 	if err == nil {
 		// If all uploads suceeded, clear transmitted portion of buffer
 		b.Lock()
-		b.data = b.data[len(buf):]
-		b.names = b.names[len(nbuf):]
+		data := make([][]byte, len(b.data)-len(buf))
+		copy(data, b.data[len(buf):])
+		b.data = nil
+		b.data = data
+		data = nil
+
+		names := make([]string, len(b.names)-len(buf))
+		copy(names, b.names[len(buf):])
+		b.names = nil
+		b.names = names
+		names = nil
+
 		b.ref = b.ref - len(buf)
 		b.Unlock()
 	}
-
+	buf = nil
+	nbuf = nil
 	return
 }

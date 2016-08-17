@@ -6,6 +6,7 @@ import (
 
 	"github.com/coreos/go-systemd/journal"
 	"github.com/coreos/go-systemd/sdjournal"
+	"github.com/fortytw2/leaktest"
 	"github.com/nutmegdevelopment/sumologic/buffer"
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
@@ -23,6 +24,8 @@ func (t *testUploader) Send(data []byte, name string) (err error) {
 }
 
 func TestWatch(t *testing.T) {
+	// Check for leaks
+	defer leaktest.Check(t)()
 
 	quitCh := make(chan bool, 1)
 	eventCh := make(chan *sdjournal.JournalEntry, 1024)
