@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fortytw2/leaktest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -20,8 +19,6 @@ func (t *testUploader) Send(data []byte, name string) (err error) {
 }
 
 func TestBuffer(t *testing.T) {
-	// Check for leaks
-	defer leaktest.Check(t)()
 
 	// Set a small buffer size so we can quickly overflow it.
 	buf := NewBuffer(8)

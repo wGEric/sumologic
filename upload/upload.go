@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"errors"
 	"net/http"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -50,6 +51,9 @@ func (u *httpUploader) Send(input []byte, name string) (err error) {
 	buf := new(bytes.Buffer)
 
 	req := new(http.Request)
+
+	req.Close = true
+	client.Timeout = 60 * time.Second
 
 	if len(input) > GzipThreshold {
 		log.Debugf("Data over threshold, compressing (%s bytes)", len(input))
