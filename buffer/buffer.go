@@ -72,14 +72,33 @@ func (b *Buffer) Send(u upload.Uploader) (err error) {
 
 	log.Debugf("%d unique names in buffer", len(packets))
 
+	ch := make(chan error, 2048)
+	var wg sync.WaitGroup
+
 	for n := range packets {
 		log.Debugf("Sending data for name: %s (%d bytes)", n, len(packets[n]))
-		thisErr := u.Send(packets[n], n)
-		if thisErr != nil {
-			log.Debugf("Send error: %s", err)
-			err = thisErr
+		wg.Add(1)
+		// Copy n
+		name := n
+		go func() {
+			err := u.Send(packets[name], name)
+			ch <- err
+			wg.Done()
+		}()
+	}
+	// Close ch after all sends are done
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	err = nil
+	for e := range ch {
+		if e != nil {
+			err = e
 		}
 	}
+
 	if err == nil {
 		// If all uploads suceeded, clear transmitted portion of buffer
 		b.Lock()
