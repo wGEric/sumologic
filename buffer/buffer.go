@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"sync"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/nutmegdevelopment/sumologic/upload"
+	log "github.com/sirupsen/logrus"
 )
 
 // DebugLogging enables debug logging

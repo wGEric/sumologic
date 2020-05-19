@@ -4,10 +4,10 @@ import (
 	"flag"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/coreos/go-systemd/sdjournal"
 	"github.com/nutmegdevelopment/sumologic/buffer"
 	"github.com/nutmegdevelopment/sumologic/upload"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
